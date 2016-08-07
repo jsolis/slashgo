@@ -1,9 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"io"
-	"net/http"
 	"log"
+	"net/http"
+	"net/url"
+	"os"
 )
 
 func main() {
@@ -14,8 +17,15 @@ func main() {
 	}
 }
 
+type Message struct {
+	Channel    string `json:"channel"`
+	Text       string `json:"text"`
+	Username   string `json:"username"`
+	Icon_emoji string `json:"icon_emoji"`
+}
+
 func handler(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, "I'll be sure to add that to my backlog...\n")
+	//io.WriteString(w, "I'll be sure to add that to my backlog...\n")
 /*
 	command := r.FormValue("command")
 
@@ -25,4 +35,26 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w,"I do not understand your command.")
 	}
 */
+
+	text := r.FormValue("text")
+
+	m := Message{"#scotty-testing", "Request: " + text, "Jay-Slack-Bot", ":thinking_face:"}
+	b, err := json.Marshal(m)
+	if err != nil {
+		return
+	}
+
+	v := url.Values{}
+	v.Set("payload", string(b))
+
+	incoming_webhook_url := os.Getenv("SLASHGO_INCOMING_WEBHOOK_URL")
+	resp, err := http.PostForm(incoming_webhook_url, v)
+
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	io.WriteString(w, "Your request has been forwarded\n")
+
 }
