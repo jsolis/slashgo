@@ -25,20 +25,13 @@ type Message struct {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	//io.WriteString(w, "I'll be sure to add that to my backlog...\n")
-/*
-	command := r.FormValue("command")
 
-	if command == "/jsolis" {
-		fmt.Fprint(w,"I'll be sure to add that to my backlog")
-	} else {
-		fmt.Fprint(w,"I do not understand your command.")
-	}
-*/
-
+	//command := r.FormValue("command")
+	user := r.FormValue("user_name")
 	text := r.FormValue("text")
+	//token := r.FormValue("token")
 
-	m := Message{"#scotty-testing", "Request: " + text, "Jay-Slack-Bot", ":thinking_face:"}
+	m := Message{"#scotty-testing", "Request from " + user + ": " + text, "Jay-Slack-Bot", ":thinking_face:"}
 	b, err := json.Marshal(m)
 	if err != nil {
 		return
